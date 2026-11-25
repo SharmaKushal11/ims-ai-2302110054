@@ -1,0 +1,113 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyPMljQDEAT3QAX5eeSjPnpB",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/SharmaKushal11/ims-ai-2302110054/blob/main/Brick.py\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "p_j7mTsM3Bjl"
+      },
+      "outputs": [],
+      "source": [
+        "\n",
+        "!pip install -q cadquery\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "\n",
+        "import math\n",
+        "from cadquery import func as cf\n",
+        "\n",
+        "def clutch_brick(rows, cols, height, stud_d, stud_h, spacing):\n",
+        "\n",
+        "    length = cols * spacing - 0.2\n",
+        "    width = rows * spacing - 0.2\n",
+        "\n",
+        "    brick = cf.box(length, width, height)\n",
+        "    stud = cf.cylinder(d=stud_d, h=stud_h)\n",
+        "\n",
+        "    for i in range(cols):\n",
+        "        for j in range(rows):\n",
+        "\n",
+        "            x = (i - (cols - 1) / 2) * spacing\n",
+        "            y = (j - (rows - 1) / 2) * spacing\n",
+        "\n",
+        "            brick = brick + stud.moved(x=x, y=y, z=height)\n",
+        "\n",
+        "    return brick\n",
+        "\n",
+        "\n",
+        "# 2 x 4 brick parameters\n",
+        "rows, cols = 2, 4\n",
+        "height, stud_d, stud_h, spacing = 9.6, 4.8, 1.7, 8.0\n",
+        "\n",
+        "brick = clutch_brick(rows, cols, height, stud_d, stud_h, spacing)\n",
+        "\n",
+        "# Expected volume calculation\n",
+        "body_vol = (cols * spacing - 0.2) * (rows * spacing - 0.2) * height\n",
+        "stud_vol = math.pi * (stud_d / 2) ** 2 * stud_h\n",
+        "\n",
+        "expected = body_vol + rows * cols * stud_vol\n",
+        "\n",
+        "# Verification\n",
+        "print(\"Valid:\", brick.isValid())\n",
+        "print(\"Actual Volume:\", round(brick.Volume(), 2))\n",
+        "print(\"Expected Volume:\", round(expected, 2))\n",
+        "print(\"Volume Check:\", abs(brick.Volume() - expected) < 0.5)\n",
+        "\n",
+        "# Export STL\n",
+        "brick.exportStl(\"brick.stl\")\n",
+        "\n",
+        "print(\"brick.stl exported successfully!\")\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "X5UbDU493RzS",
+        "outputId": "d5051e50-77db-4d39-c168-3f2a47e06e25"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Valid: True\n",
+            "Actual Volume: 5069.52\n",
+            "Expected Volume: 5069.52\n",
+            "Volume Check: True\n",
+            "brick.stl exported successfully!\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
